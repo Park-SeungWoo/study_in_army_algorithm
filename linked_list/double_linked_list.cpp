@@ -1,11 +1,16 @@
 #include <iostream>
 
+class node;
+class Pylist;
+// void concat(char res[], char str[]);
+
 class node {
 private:
   node *next;
   node *prev;
   int body;
   friend class Pylist;
+  friend std::ostream &operator<<(std::ostream &strm, const Pylist &list);
 };
 
 class Pylist {
@@ -13,13 +18,13 @@ private:
   node *head;
   node *tail;
   int count;
+  friend std::ostream &operator<<(std::ostream &strm, const Pylist &list);
 
 public:
   Pylist();
   ~Pylist();
   void append(int value);
   int pop(int idx);
-  void print();
   int len();
   int operator[](int index);
 };
@@ -54,17 +59,6 @@ void Pylist::append(int value) {
   };
   this->tail = temp;
   this->count++;
-};
-
-void Pylist::print() {
-  node *temp;
-  temp = this->head;
-  std::cout << "[";
-  for (; temp != NULL;) {
-    std::cout << " " << temp->body;
-    temp = temp->next;
-  };
-  std::cout << " ]" << std::endl;
 };
 
 int Pylist::len() { return this->count; };
@@ -123,19 +117,39 @@ int Pylist::operator[](int index) {
   return temp->body;
 };
 
+// instead of to sting, overloading io operators
+std::ostream &operator<<(std::ostream &strm, const Pylist &list) {
+  node *temp;
+  temp = list.head;
+  std::cout << "[";
+  for (; temp != NULL;) {
+    std::cout << " " << temp->body;
+    temp = temp->next;
+  };
+  std::cout << " ]";
+  return strm;
+};
+
+// //////////////additional funcs
+// void concat(char res[], char str[]) {
+//   int count;
+//   for (count = 0; res[count] != '\0'; count++)
+//     ;
+//   for (int i = 0; str[i] != '\0'; i++) {
+//     res[count] = str[i];
+//     count++;
+//   };
+//   res[count] = '\0';
+// };
+
 int main() {
   Pylist dl = Pylist();
+  Pylist ddl = Pylist();
   dl.append(10);
   dl.append(20);
-  dl.append(30);
-  dl.append(40);
-  dl.append(50);
-  dl.print();
-  std::cout << dl.pop(2) << std::endl;
-  std::cout << dl.pop(0) << std::endl;
-  std::cout << dl.pop() << std::endl;
-  dl.print();
-  dl.append(dl.pop(0));
-  dl.print();
-  std::cout << dl[1] << std::endl;
+  std::cout << dl << std::endl;
+  ddl.append(100);
+  ddl.append(200);
+  std::cout << dl << ddl << std::endl;
+  std::cout << "hello" << std::endl;
 };
