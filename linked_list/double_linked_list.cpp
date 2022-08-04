@@ -2,7 +2,6 @@
 
 class node;
 class Pylist;
-// void concat(char res[], char str[]);
 
 class node {
 private:
@@ -64,57 +63,108 @@ void Pylist::append(int value) {
 int Pylist::len() { return this->count; };
 
 int Pylist::pop(int idx = -1) {
-  node *temp;
-  node *target;
-  int result;
-  temp = target = this->head;
-  if (idx > this->count - 1) { // exception, next
-                               // time I'll process it by using try
-    std::cout << "index out of range" << std::endl;
-    return -1;
-  };
-  if (idx == this->count - 1) {
-    idx = -1;
-  };
-  // pop process start
-  if (idx == 0 || this->count == 1) { // first element
-    this->head = this->head->next;
-  } else if (idx == -1) { // last element
-    target = this->tail;
-    this->tail = this->tail->prev;
-    this->tail->next = NULL;
-  } else { // and the others
-    for (int i = 0; i < idx; i++) {
-      temp = target;
-      target = target->next;
+  try {
+    if (idx > this->count - 1) // exception
+      throw idx;
+    if (idx * -1 > this->count) // exception
+      throw idx;
+
+    node *temp;
+    node *target;
+    int result;
+
+    // preprocessing index
+    if (idx == this->count - 1) {
+      idx = -1;
     };
-    temp->next = target->next;
-    target->next->prev = temp;
-  };
-  result = target->body;
-  delete (target);
-  this->count--;
-  return result;
+    if (idx < 0) {
+      if (idx * -1 > this->count / 2) {
+        idx = this->count + idx;
+      };
+    } else {
+      if (idx + 1 > this->count / 2) {
+        idx = (this->count - idx) * -1;
+      };
+    };
+
+    // pop process start
+    if (idx < 0) {     // if index < 0
+      if (idx == -1) { // last element
+        target = this->tail;
+        this->tail = this->tail->prev;
+        this->tail->next = NULL;
+      } else {
+        temp = target = this->tail;
+        for (int i = 0; i > idx + 1; i--) {
+          temp = target;
+          target = target->prev;
+        };
+        temp->prev = target->prev;
+        target->prev->next = temp;
+      };
+    } else { // if index > -1
+      temp = target = this->head;
+      if (idx == 0 || this->count == 1) { // first element
+        this->head = this->head->next;
+      } else { // and the others
+        for (int i = 0; i < idx; i++) {
+          temp = target;
+          target = target->next;
+        };
+        temp->next = target->next;
+        target->next->prev = temp;
+      };
+    };
+    result = target->body;
+    delete (target);
+    this->count--;
+    return result;
+  } catch (int idx) {
+    std::cout << "index out of range: index(" << idx
+              << ") is bigger than the list size." << std::endl;
+    exit(1); // kill process (common error)
+  }
 };
 
-int Pylist::operator[](int index) {
-  if (index > this->count - 1) { // same as pop
-    std::cout << "index out of range" << std::endl;
-    return -1;
-  };
-  node *temp;
-  if (index > this->count / 2) {
-    temp = this->tail;
-    for (int i = this->count - 1; i > index; i--) {
-      temp = temp->prev;
+int Pylist::operator[](int index) { // add process to handle if index < 0
+  try {
+    if (index > this->count - 1) // exception
+      throw index;
+    if (index * -1 > this->count) // exception
+      throw index;
+
+    // index preprocessing
+    if (index < 0) {
+      if (index * -1 > this->count / 2) {
+        index = this->count + index;
+      };
+    } else {
+      if (index + 1 > this->count / 2) {
+        index = (this->count - index) * -1;
+      };
     };
-  } else {
-    temp = this->head;
-    for (int i = 0; i < index; i++) {
-      temp = temp->next;
+
+    node *temp;
+
+    if (index < 0) {
+      std::cout << '-' << std::endl;
+      temp = this->tail;
+      for (int i = 0; i > index + 1; i--) {
+        temp = temp->prev;
+      };
+    } else {
+      std::cout << '+' << std::endl;
+      temp = this->head;
+      for (int i = 0; i < index; i++) {
+        temp = temp->next;
+      };
     };
+    return temp->body;
+  } catch (int idx) {
+    std::cout << "index out of range: index(" << idx
+              << ") is bigger than the list size." << std::endl;
+    exit(1); // kill process (common error)
   };
-  return temp->body;
 };
 
 // instead of to sting, overloading io operators
@@ -130,26 +180,14 @@ std::ostream &operator<<(std::ostream &strm, const Pylist &list) {
   return strm;
 };
 
-// //////////////additional funcs
-// void concat(char res[], char str[]) {
-//   int count;
-//   for (count = 0; res[count] != '\0'; count++)
-//     ;
-//   for (int i = 0; str[i] != '\0'; i++) {
-//     res[count] = str[i];
-//     count++;
-//   };
-//   res[count] = '\0';
-// };
-
 int main() {
   Pylist dl = Pylist();
-  Pylist ddl = Pylist();
   dl.append(10);
   dl.append(20);
+  dl.append(30);
+  dl.append(40);
+  dl.append(50);
   std::cout << dl << std::endl;
-  ddl.append(100);
-  ddl.append(200);
-  std::cout << dl << ddl << std::endl;
-  std::cout << "hello" << std::endl;
+  std::cout << dl[-6] << std::endl; // error
+  std::cout << dl << std::endl;
 };
