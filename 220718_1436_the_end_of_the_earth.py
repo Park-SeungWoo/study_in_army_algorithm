@@ -1,5 +1,6 @@
 import sys
 
+
 def the_end_of_the_earth(num: int) -> int:
     threesix: int = 666
     count: int = 1
